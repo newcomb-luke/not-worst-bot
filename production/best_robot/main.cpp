@@ -2,18 +2,18 @@
 #include "robot.h"
 
 // Left servo constants
-#define LEFT_PIN    2
-#define LEFT_DRIVE  1100
-#define LEFT_REV    2200
-#define LEFT_STOP   1500
-#define LEFT_TURN   650
+#define LEFT_PIN    3
+#define LEFT_DRIVE  2200
+#define LEFT_REV    834
+#define LEFT_STOP   1515
+#define LEFT_TURN   800
 
 // Right servo constants
-#define RIGHT_PIN   3
-#define RIGHT_DRIVE 1100
+#define RIGHT_PIN   5
+#define RIGHT_DRIVE 838
 #define RIGHT_REV   2200
-#define RIGHT_STOP  1500
-#define RIGHT_TURN  650
+#define RIGHT_STOP  1519
+#define RIGHT_TURN  800
 
 Robot myRobot(LEFT_PIN, RIGHT_PIN);
 
@@ -29,6 +29,30 @@ int main(void)
 
   // Start
   myRobot.begin();
+
+  delay(5000);
+
+  myRobot.turnLeft(90);
+
+  delay(2000);
+
+  myRobot.driveTimed(2400);
+
+  delay(2000);
+
+  myRobot.turnRight(90);
+
+  delay(2000);
+
+  myRobot.reverseTimed(2400);
+
+  delay(2000);
+
+  myRobot.turnLeft(90);
+
+  delay(2000);
+
+  myRobot.reverseTimed(2400);
 
   // Infinite loop
   for (;;)
