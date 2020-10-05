@@ -10,6 +10,9 @@
 #include <Servo.h>
 #include <Arduino.h>
 
+#define RIGHT 0
+#define LEFT  1
+
 class Robot
 {
   private:
@@ -37,6 +40,7 @@ class Robot
     void reverseTimed(int); // Drives forward for a given number of milliseconds
     void turnLeft(int); // Turns to the left a given number of degrees
     void turnRight(int); // Turn to the right a given number of degrees
+    void driveWheelTimed(int, int); // Turns one wheel, given by an int, a specified number of ms
 };
 
 #endif

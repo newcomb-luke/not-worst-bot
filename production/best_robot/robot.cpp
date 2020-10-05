@@ -117,3 +117,26 @@ void Robot::turnRight(int deg)
   _rightServo.write(_rightStop);
   _leftServo.write(_leftStop);
 }
+
+/**
+ * Turns one wheel, given by an int, a specified number of ms
+ * 0 = RIGHT
+ * 1 = LEFT
+ */
+void Robot::driveWheelTimed(int wheel, int ms)
+{
+  // Start the servos
+  if (wheel == LEFT)
+    _leftServo.write(_leftDrive);
+  else
+    _rightServo.write(_rightDrive);
+
+  // TODO: Make this async?
+  delay(ms); // Waits for milliseconds
+
+  // Stop the servos
+  if (wheel == LEFT)
+    _leftServo.write(_leftStop);
+  else
+    _rightServo.write(_rightStop);
+}
