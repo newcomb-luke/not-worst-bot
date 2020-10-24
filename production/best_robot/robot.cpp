@@ -71,6 +71,34 @@ void Robot::driveTimed(int ms)
 }
 
 /**
+ * Drives with a given speed percentage
+ * Min = -100 or backwards
+ * Max = 100 or forwards
+ */
+void Robot::setPower(int percent)
+{
+  int scaledLeft = map(percent, -100, 100, _leftRev, _leftDrive);
+  int scaledRight = map(percent, -100, 100, _rightRev, _rightDrive);
+  
+  _leftServo.write(scaledLeft);
+  _rightServo.write(scaledRight);
+}
+
+/**
+ * Drives both wheels independently with given speed percentages
+ * Min = -100 or backwards
+ * Max = 100 or forwards
+ */
+void Robot::setWheelPowers(int percentLeft, int percentRight)
+{
+  int scaledLeft = map(percentLeft, -100, 100, _leftRev, _leftDrive);
+  int scaledRight = map(percentRight, -100, 100, _rightRev, _rightDrive);
+  
+  _leftServo.write(scaledLeft);
+  _rightServo.write(scaledRight);
+}
+
+/**
  * Drives the robot backwards for a certain number of milliseconds, and then stops
  */
 void Robot::reverseTimed(int ms)
@@ -123,10 +151,10 @@ void Robot::turnRight(int deg)
  * 0 = RIGHT
  * 1 = LEFT
  */
-void Robot::driveWheelTimed(int wheel, int ms)
+void Robot::driveWheelTimed(Wheel wheel, int ms)
 {
   // Start the servos
-  if (wheel == LEFT)
+  if (wheel == Wheel::LEFT)
     _leftServo.write(_leftDrive);
   else
     _rightServo.write(_rightDrive);
@@ -135,8 +163,27 @@ void Robot::driveWheelTimed(int wheel, int ms)
   delay(ms); // Waits for milliseconds
 
   // Stop the servos
-  if (wheel == LEFT)
+  if (wheel == Wheel::LEFT)
     _leftServo.write(_leftStop);
   else
     _rightServo.write(_rightStop);
+}
+
+/**
+ * Creates a new PID controller object using the FeedForward P, I, and D constants
+ */
+PIDController::PIDController(float ff, float p, float i, float d)
+{
+  _ff = ff;
+  _p = p;
+  _i = i;
+  _d = d;
+}
+
+/**
+ * Gets the output using the specified error
+ */
+float PIDController::getOutput(float error)
+{
+  
 }

@@ -1,63 +1,98 @@
 #include <Arduino.h>
 #include "robot.h"
+#include "linesensor.h"
 
 // Left servo constants
 #define LEFT_PIN    3
-#define LEFT_DRIVE  2200
-#define LEFT_REV    834
-#define LEFT_STOP   1515
+#define LEFT_DRIVE  1800
+#define LEFT_REV    1200
+#define LEFT_STOP   1500
 #define LEFT_TURN   800
 
 // Right servo constants
 #define RIGHT_PIN   5
-#define RIGHT_DRIVE 838
-#define RIGHT_REV   2200
-#define RIGHT_STOP  1519
+#define RIGHT_DRIVE 1200
+#define RIGHT_REV   1800
+#define RIGHT_STOP  1500
 #define RIGHT_TURN  800
 
-Robot myRobot(LEFT_PIN, RIGHT_PIN);
+// IR line sensor constants
+#define RIGHT_IR     A0
+#define RIGHT_THRESH 995
+#define LEFT_IR      A1
+#define LEFT_THRESH  950
 
 int main(void)
 {
 
-  init(); // Allow Arduino to initialize AVR timers
+    Robot myRobot(LEFT_PIN, RIGHT_PIN);
+    LineSensor sensor(LEFT_IR, RIGHT_IR, LEFT_THRESH, RIGHT_THRESH);
 
-  // Configure the robot
-  myRobot.setDrives(LEFT_DRIVE, RIGHT_DRIVE, LEFT_REV, RIGHT_REV);
-  myRobot.setStops(LEFT_STOP, RIGHT_STOP);
-  myRobot.setTurnTimes(LEFT_TURN, RIGHT_TURN);
+    SensorState state = SensorState::NEITHER;
+    SensorState lastState = SensorState::NEITHER;
+    unsigned long msOffCourse = 0;
+    int wheelSlowdown = 0;
 
-  // Start
-  myRobot.begin();
+    init(); // Allow Arduino to initialize AVR timers
 
-  delay(5000);
+    Serial.begin(9600);
 
-  myRobot.turnLeft(90);
+    // Configure the robot
+    myRobot.setDrives(LEFT_DRIVE, RIGHT_DRIVE, LEFT_REV, RIGHT_REV);
+    myRobot.setStops(LEFT_STOP, RIGHT_STOP);
+    myRobot.setTurnTimes(LEFT_TURN, RIGHT_TURN);
 
-  delay(2000);
+    // Start
+    myRobot.begin();
 
-  myRobot.driveTimed(2400);
+    Serial.begin(9600);
 
-  delay(2000);
+    delay(5000);
 
-  myRobot.turnRight(90);
+    myRobot.setWheelPowers(0, 0);
 
-  delay(2000);
+    /*
 
-  myRobot.reverseTimed(2400);
+    if left
+        turn right proportional to the time that it is off course
+    if right
+        turn left proportional to the time that it is off course
+    if neither
+        drive forward
+    if both
+        stop
 
-  delay(2000);
+    */
 
-  myRobot.turnLeft(90);
+    // Infinite loop
+    for (;;)
+    {
+        state = sensor.readState();
 
-  delay(2000);
+        if (state != lastState)
+        {
+            msOffCourse = millis();
+            lastState = state;
+        }
 
-  myRobot.reverseTimed(2400);
+        wheelSlowdown = 100 - static_cast<int>((static_cast<float>(millis() - msOffCourse) / 200.0f) * 40.0f);
 
-  // Infinite loop
-  for (;;)
-  {
-    
-  }
-  
+        switch (state)
+        {
+            case SensorState::LEFT:
+                myRobot.setWheelPowers(wheelSlowdown, 100);
+                break;
+            case SensorState::RIGHT:
+                myRobot.setWheelPowers(100, wheelSlowdown);
+                break;
+            case SensorState::BOTH:
+                // Stop the robot forever
+                myRobot.setWheelPowers(0, 0);
+                break;
+                // for (;;) {}
+            default:
+                myRobot.setWheelPowers(100, 100);
+        }
+    }
+
 }

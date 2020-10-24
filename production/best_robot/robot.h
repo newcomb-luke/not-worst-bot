@@ -10,8 +10,11 @@
 #include <Servo.h>
 #include <Arduino.h>
 
-#define RIGHT 0
-#define LEFT  1
+enum class Wheel
+{
+  RIGHT,
+  LEFT
+};
 
 class Robot
 {
@@ -37,10 +40,25 @@ class Robot
     void setStops(int, int); // Sets the stop duty cycles for each servo
     void setTurnTimes(int, int); // Sets the turn times for both left and right
     void driveTimed(int); // Drives forward for a given number of milliseconds
+    void setPower(int); // Drives with a given speed percentage
+    void setWheelPowers(int, int); // Drives both wheels independently with given speed percentages
     void reverseTimed(int); // Drives forward for a given number of milliseconds
     void turnLeft(int); // Turns to the left a given number of degrees
     void turnRight(int); // Turn to the right a given number of degrees
-    void driveWheelTimed(int, int); // Turns one wheel, given by an int, a specified number of ms
+    void driveWheelTimed(Wheel, int); // Turns one wheel, given by an int, a specified number of ms
+};
+
+class PIDController
+{
+  private:
+    float _ff = 0.0f;
+    float _p = 0.0f;
+    float _i = 0.0f;
+    float _d = 0.0f;
+    unsigned long _lastUpdated = 0;
+  public:
+    PIDController(float, float, float, float); // Creates a new PID controller object using the FeedForward P, I, and D constants
+    float getOutput(float); // Gets the output using the specified error
 };
 
 #endif
